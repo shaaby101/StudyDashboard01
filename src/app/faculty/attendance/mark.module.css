@@ -1,0 +1,55 @@
+.page { display: flex; flex-direction: column; gap: 24px; max-width: 900px; }
+.header h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 4px; }
+.header p { color: var(--text-secondary); font-size: 0.9375rem; }
+
+.controls { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.subjectTabs { display: flex; gap: 8px; flex-wrap: wrap; }
+.subjectTab {
+  padding: 8px 16px; border-radius: var(--radius-md); font-size: 0.8125rem; font-weight: 500;
+  background: var(--surface); border: 1px solid var(--border-subtle); cursor: pointer;
+  color: var(--text-secondary); transition: all var(--transition-fast);
+}
+.subjectTab:hover { border-color: var(--accent); }
+.subjectTab.active { background: var(--accent-light); color: var(--accent); border-color: var(--accent); font-weight: 600; }
+
+.controlActions { display: flex; align-items: center; gap: 12px; }
+.countBadge {
+  display: flex; align-items: center; gap: 6px; padding: 6px 12px;
+  background: var(--surface); border-radius: var(--radius-full);
+  font-size: 0.8125rem; font-weight: 600; color: var(--text-secondary);
+}
+
+.studentList { padding: 0; overflow: hidden; }
+.listHeader {
+  display: grid; grid-template-columns: 120px 1fr 120px; padding: 12px 20px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--text-tertiary); border-bottom: 1px solid var(--border-subtle);
+}
+
+.studentRow {
+  display: grid; grid-template-columns: 120px 1fr 120px; padding: 14px 20px;
+  align-items: center; cursor: pointer; transition: all var(--transition-fast);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.studentRow:last-child { border-bottom: none; }
+.studentRow:hover { background: var(--surface); }
+.studentRow.present { background: var(--success-light); }
+
+.rollNo { font-family: var(--font-display); font-size: 0.875rem; font-weight: 600; color: var(--text-tertiary); }
+.studentName { font-size: 0.9375rem; font-weight: 500; }
+
+.statusBtn {
+  display: flex; align-items: center; gap: 6px; padding: 6px 14px;
+  border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600;
+  cursor: pointer; border: none; transition: all var(--transition-fast);
+}
+.statusPresent { background: var(--success); color: white; }
+.statusAbsent { background: var(--surface); color: var(--text-tertiary); border: 1px solid var(--border-subtle); }
+
+.submitArea { display: flex; justify-content: center; padding: 8px 0; }
+.successMsg {
+  display: flex; align-items: center; gap: 8px; padding: 14px 28px;
+  background: var(--success-light); color: var(--success); border-radius: var(--radius-lg);
+  font-weight: 600; font-size: 0.9375rem; animation: fadeInUp 0.3s ease-out;
+}
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }

@@ -1,0 +1,234 @@
+'use client';
+
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+
+const AppContext = createContext();
+
+// Mock data
+const MOCK_USERS = {
+  student: {
+    id: 'STU001',
+    name: 'Arjun Mehta',
+    email: 'arjun.mehta@campus.edu',
+    role: 'student',
+    avatar: 'AM',
+    department: 'Computer Science',
+    semester: 5,
+    enrolledCourses: ['CS301', 'CS302', 'CS303', 'CS304', 'CS305'],
+  },
+  faculty: {
+    id: 'FAC001',
+    name: 'Dr. Priya Sharma',
+    email: 'priya.sharma@campus.edu',
+    role: 'faculty',
+    avatar: 'PS',
+    department: 'Computer Science',
+    subjects: ['CS301', 'CS303'],
+  },
+  admin: {
+    id: 'ADM001',
+    name: 'Prof. Rajesh Kumar',
+    email: 'rajesh.kumar@campus.edu',
+    role: 'admin',
+    avatar: 'RK',
+    designation: 'Principal',
+  },
+};
+
+const MOCK_COURSES = [
+  { id: 'CS301', name: 'Data Structures & Algorithms', code: 'CS301', faculty: 'Dr. Priya Sharma', credits: 4 },
+  { id: 'CS302', name: 'Operating Systems', code: 'CS302', faculty: 'Dr. Ankit Verma', credits: 4 },
+  { id: 'CS303', name: 'Database Management Systems', code: 'CS303', faculty: 'Dr. Priya Sharma', credits: 3 },
+  { id: 'CS304', name: 'Computer Networks', code: 'CS304', faculty: 'Prof. Neha Gupta', credits: 3 },
+  { id: 'CS305', name: 'Software Engineering', code: 'CS305', faculty: 'Dr. Sanjay Patel', credits: 3 },
+];
+
+const generateAttendanceData = () => {
+  const subjects = ['CS301', 'CS302', 'CS303', 'CS304', 'CS305'];
+  const data = {};
+  subjects.forEach(sub => {
+    const total = Math.floor(Math.random() * 15) + 25;
+    const attended = Math.floor(total * (0.55 + Math.random() * 0.4));
+    data[sub] = {
+      total,
+      attended,
+      percentage: Math.round((attended / total) * 100),
+      records: Array.from({ length: total }, (_, i) => ({
+        date: new Date(2026, 0, 6 + i * 2).toISOString().split('T')[0],
+        present: i < attended,
+      })),
+    };
+  });
+  return data;
+};
+
+const MOCK_ATTENDANCE = generateAttendanceData();
+
+const MOCK_SCHEDULE = [
+  { id: 1, day: 'Monday', time: '09:00 - 10:00', subject: 'CS301', room: 'LH-101', type: 'Lecture' },
+  { id: 2, day: 'Monday', time: '10:15 - 11:15', subject: 'CS303', room: 'LH-102', type: 'Lecture' },
+  { id: 3, day: 'Monday', time: '14:00 - 16:00', subject: 'CS301', room: 'Lab-A', type: 'Lab' },
+  { id: 4, day: 'Tuesday', time: '09:00 - 10:00', subject: 'CS302', room: 'LH-103', type: 'Lecture' },
+  { id: 5, day: 'Tuesday', time: '10:15 - 11:15', subject: 'CS304', room: 'LH-101', type: 'Lecture' },
+  { id: 6, day: 'Tuesday', time: '11:30 - 12:30', subject: 'CS305', room: 'LH-104', type: 'Lecture' },
+  { id: 7, day: 'Wednesday', time: '09:00 - 10:00', subject: 'CS301', room: 'LH-101', type: 'Lecture' },
+  { id: 8, day: 'Wednesday', time: '10:15 - 11:15', subject: 'CS303', room: 'LH-102', type: 'Lecture' },
+  { id: 9, day: 'Wednesday', time: '14:00 - 16:00', subject: 'CS303', room: 'Lab-B', type: 'Lab' },
+  { id: 10, day: 'Thursday', time: '09:00 - 10:00', subject: 'CS302', room: 'LH-103', type: 'Lecture' },
+  { id: 11, day: 'Thursday', time: '10:15 - 11:15', subject: 'CS304', room: 'LH-101', type: 'Lecture' },
+  { id: 12, day: 'Thursday', time: '11:30 - 12:30', subject: 'CS305', room: 'LH-104', type: 'Lecture' },
+  { id: 13, day: 'Friday', time: '09:00 - 10:00', subject: 'CS301', room: 'LH-101', type: 'Lecture' },
+  { id: 14, day: 'Friday', time: '10:15 - 12:15', subject: 'CS302', room: 'Lab-C', type: 'Lab' },
+];
+
+const MOCK_FACULTY_LIST = [
+  { id: 'FAC001', name: 'Dr. Priya Sharma', department: 'Computer Science', subjects: ['CS301', 'CS303'], status: 'active' },
+  { id: 'FAC002', name: 'Dr. Ankit Verma', department: 'Computer Science', subjects: ['CS302'], status: 'active' },
+  { id: 'FAC003', name: 'Prof. Neha Gupta', department: 'Computer Science', subjects: ['CS304'], status: 'on-leave' },
+  { id: 'FAC004', name: 'Dr. Sanjay Patel', department: 'Computer Science', subjects: ['CS305'], status: 'active' },
+  { id: 'FAC005', name: 'Dr. Meera Iyer', department: 'Electronics', subjects: ['EC301', 'EC302'], status: 'active' },
+  { id: 'FAC006', name: 'Prof. Amit Joshi', department: 'Mechanical', subjects: ['ME301'], status: 'active' },
+];
+
+const MOCK_LEAVE_REQUESTS = [
+  { id: 1, faculty: 'Prof. Neha Gupta', type: 'Medical', from: '2026-05-01', to: '2026-05-05', status: 'approved', reason: 'Medical appointment' },
+  { id: 2, faculty: 'Dr. Priya Sharma', type: 'Casual', from: '2026-05-10', to: '2026-05-10', status: 'pending', reason: 'Personal work' },
+];
+
+const MOCK_SYLLABUS = {
+  CS301: {
+    title: 'Data Structures & Algorithms',
+    units: [
+      { name: 'Unit 1: Introduction & Arrays', topics: ['Arrays', 'Linked Lists', 'Stacks', 'Queues', 'Time & Space Complexity'] },
+      { name: 'Unit 2: Trees', topics: ['Binary Trees', 'BST', 'AVL Trees', 'B-Trees', 'Tree Traversals'] },
+      { name: 'Unit 3: Graphs', topics: ['Graph Representations', 'BFS', 'DFS', 'Shortest Path', 'MST'] },
+      { name: 'Unit 4: Sorting & Searching', topics: ['Merge Sort', 'Quick Sort', 'Heap Sort', 'Hashing', 'Binary Search'] },
+      { name: 'Unit 5: Advanced Topics', topics: ['Dynamic Programming', 'Greedy Algorithms', 'Backtracking', 'Divide & Conquer'] },
+    ],
+  },
+  CS302: {
+    title: 'Operating Systems',
+    units: [
+      { name: 'Unit 1: OS Fundamentals', topics: ['Process Management', 'Threads', 'CPU Scheduling', 'Process Synchronization'] },
+      { name: 'Unit 2: Memory Management', topics: ['Paging', 'Segmentation', 'Virtual Memory', 'Page Replacement'] },
+      { name: 'Unit 3: File Systems', topics: ['File Organization', 'Directory Structure', 'Disk Scheduling', 'RAID'] },
+      { name: 'Unit 4: Deadlocks', topics: ['Deadlock Prevention', 'Deadlock Avoidance', 'Deadlock Detection', 'Recovery'] },
+    ],
+  },
+  CS303: {
+    title: 'Database Management Systems',
+    units: [
+      { name: 'Unit 1: Relational Model', topics: ['ER Model', 'Relational Algebra', 'SQL Basics', 'Normalization'] },
+      { name: 'Unit 2: SQL Advanced', topics: ['Joins', 'Subqueries', 'Views', 'Stored Procedures', 'Triggers'] },
+      { name: 'Unit 3: Transactions', topics: ['ACID Properties', 'Concurrency Control', 'Locking', 'Deadlock Handling'] },
+      { name: 'Unit 4: NoSQL & Indexing', topics: ['B+ Trees', 'Hashing', 'MongoDB Basics', 'CAP Theorem'] },
+    ],
+  },
+  CS304: {
+    title: 'Computer Networks',
+    units: [
+      { name: 'Unit 1: Network Fundamentals', topics: ['OSI Model', 'TCP/IP', 'Network Topologies', 'Switching'] },
+      { name: 'Unit 2: Data Link Layer', topics: ['Framing', 'Error Detection', 'Flow Control', 'MAC Protocols'] },
+      { name: 'Unit 3: Network Layer', topics: ['IP Addressing', 'Routing Algorithms', 'Subnetting', 'IPv6'] },
+      { name: 'Unit 4: Transport & Application', topics: ['TCP', 'UDP', 'DNS', 'HTTP', 'Email Protocols'] },
+    ],
+  },
+  CS305: {
+    title: 'Software Engineering',
+    units: [
+      { name: 'Unit 1: Software Process', topics: ['SDLC Models', 'Agile', 'Scrum', 'Requirements Engineering'] },
+      { name: 'Unit 2: Design', topics: ['UML Diagrams', 'Design Patterns', 'Architecture', 'Component Design'] },
+      { name: 'Unit 3: Testing', topics: ['Unit Testing', 'Integration Testing', 'Black Box', 'White Box', 'Test Driven Development'] },
+      { name: 'Unit 4: Project Management', topics: ['Estimation', 'Risk Management', 'Quality Assurance', 'Maintenance'] },
+    ],
+  },
+};
+
+export function AppProvider({ children }) {
+  const [theme, setTheme] = useState('light');
+  const [user, setUser] = useState(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [attendance, setAttendance] = useState(MOCK_ATTENDANCE);
+  const [notifications, setNotifications] = useState([
+    { id: 1, type: 'warning', message: 'Low attendance in CS304 — 68%', time: '2 hours ago', read: false },
+    { id: 2, type: 'info', message: 'New syllabus uploaded for CS301', time: '5 hours ago', read: false },
+    { id: 3, type: 'success', message: 'Leave request approved', time: '1 day ago', read: true },
+  ]);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('studesh-theme') || 'light';
+    setTheme(savedTheme);
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
+    const savedUser = localStorage.getItem('studesh-user');
+    if (savedUser) {
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (e) {
+        localStorage.removeItem('studesh-user');
+      }
+    }
+  }, []);
+
+  const toggleTheme = useCallback(() => {
+    setTheme(prev => {
+      const next = prev === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('studesh-theme', next);
+      return next;
+    });
+  }, []);
+
+  const login = useCallback((role) => {
+    const userData = MOCK_USERS[role];
+    setUser(userData);
+    localStorage.setItem('studesh-user', JSON.stringify(userData));
+  }, []);
+
+  const logout = useCallback(() => {
+    setUser(null);
+    localStorage.removeItem('studesh-user');
+  }, []);
+
+  const markAttendance = useCallback((courseId, studentId, present) => {
+    setAttendance(prev => {
+      const updated = { ...prev };
+      if (updated[courseId]) {
+        updated[courseId] = {
+          ...updated[courseId],
+          total: updated[courseId].total + 1,
+          attended: updated[courseId].attended + (present ? 1 : 0),
+          percentage: Math.round(((updated[courseId].attended + (present ? 1 : 0)) / (updated[courseId].total + 1)) * 100),
+        };
+      }
+      return updated;
+    });
+  }, []);
+
+  const value = {
+    theme,
+    toggleTheme,
+    user,
+    login,
+    logout,
+    sidebarCollapsed,
+    setSidebarCollapsed,
+    courses: MOCK_COURSES,
+    attendance,
+    markAttendance,
+    schedule: MOCK_SCHEDULE,
+    facultyList: MOCK_FACULTY_LIST,
+    leaveRequests: MOCK_LEAVE_REQUESTS,
+    syllabus: MOCK_SYLLABUS,
+    notifications,
+    setNotifications,
+  };
+
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+}
+
+export function useApp() {
+  const context = useContext(AppContext);
+  if (!context) throw new Error('useApp must be used within AppProvider');
+  return context;
+}

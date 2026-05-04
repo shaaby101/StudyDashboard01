@@ -1,0 +1,42 @@
+.page { display: flex; flex-direction: column; gap: 24px; max-width: 1200px; }
+.header h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 4px; }
+.header p { color: var(--text-secondary); font-size: 0.9375rem; }
+
+.mainGrid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px; }
+
+.card { padding: 24px; }
+.cardHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.cardHeader h3 { font-size: 1rem; font-weight: 600; }
+
+.emptyState { text-align: center; padding: 40px; color: var(--text-tertiary); font-size: 1rem; }
+
+.classList { display: flex; flex-direction: column; gap: 12px; }
+.classItem {
+  display: flex; align-items: center; gap: 16px; padding: 12px 16px;
+  background: var(--surface); border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle); transition: all var(--transition-fast);
+}
+.classItem:hover { border-color: var(--accent-glow); }
+.classItem h4 { font-size: 0.9375rem; font-weight: 600; }
+.classTime { display: flex; align-items: center; gap: 6px; font-size: 0.8125rem; color: var(--accent); font-weight: 600; min-width: 130px; }
+.classMeta { font-size: 0.75rem; color: var(--text-tertiary); }
+.classItem .btn { margin-left: auto; flex-shrink: 0; }
+
+.subjectList { display: flex; flex-direction: column; gap: 10px; }
+.subjectItem { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--surface); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); }
+.subjectIcon {
+  width: 40px; height: 40px; min-width: 40px; border-radius: var(--radius-md);
+  background: var(--accent-gradient); color: white; display: flex;
+  align-items: center; justify-content: center; font-family: var(--font-display);
+  font-size: 0.8125rem; font-weight: 700;
+}
+.subjectItem h4 { font-size: 0.875rem; font-weight: 600; }
+.subjectMeta { font-size: 0.75rem; color: var(--text-tertiary); }
+
+.quickActions h3 { font-size: 1rem; font-weight: 600; margin-bottom: 16px; }
+.actionGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+
+@media (max-width: 1024px) {
+  .mainGrid { grid-template-columns: 1fr; }
+  .actionGrid { grid-template-columns: repeat(2, 1fr); }
+}

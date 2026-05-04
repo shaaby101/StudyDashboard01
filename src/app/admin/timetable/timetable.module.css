@@ -1,0 +1,93 @@
+.page { display: flex; flex-direction: column; gap: 24px; max-width: 1200px; }
+.header h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 4px; }
+.header p { color: var(--text-secondary); font-size: 0.9375rem; }
+
+.configGrid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; }
+.card { padding: 24px; }
+.card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 16px; }
+
+.facultyList { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.facultyItem {
+  display: flex; align-items: center; justify-content: space-between; padding: 12px 14px;
+  background: var(--surface); border-radius: var(--radius-md); border: 1px solid var(--border-subtle);
+}
+.facultyItem strong { font-size: 0.875rem; }
+.subjectTags { display: flex; gap: 4px; margin-top: 4px; }
+.subjectTag {
+  padding: 2px 8px; background: var(--accent-light); color: var(--accent);
+  border-radius: var(--radius-full); font-size: 0.6875rem; font-weight: 500;
+}
+.hoursLabel { font-size: 0.6875rem; color: var(--text-tertiary); display: block; margin-top: 2px; }
+
+.removeBtn {
+  width: 28px; height: 28px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-tertiary); cursor: pointer; border: none; background: none;
+  transition: all var(--transition-fast);
+}
+.removeBtn:hover { background: var(--danger-light); color: var(--danger); }
+
+.addForm {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+}
+.addForm input { flex: 1; min-width: 100px; padding: 8px 12px; font-size: 0.8125rem; }
+
+.configForm { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+
+.generateBtn { margin-top: 8px; }
+
+.spinner {
+  width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Generated Timetable */
+.resultCard { padding: 24px; animation: fadeInUp 0.3s ease-out; }
+.resultHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+.resultHeader h3 { font-size: 1rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.resultActions { display: flex; gap: 8px; }
+
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+.timetableGrid {
+  display: grid; grid-template-columns: 70px repeat(5, 1fr); gap: 2px;
+  overflow-x: auto; min-width: 700px;
+}
+
+.ttCorner {
+  padding: 10px; font-size: 0.6875rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--text-tertiary);
+}
+
+.ttDayHeader {
+  padding: 10px; text-align: center; font-family: var(--font-display);
+  font-weight: 600; font-size: 0.875rem; color: var(--text-secondary);
+}
+
+.ttTimeCell {
+  padding: 8px; font-size: 0.75rem; font-weight: 600; color: var(--text-tertiary);
+  font-family: var(--font-display); text-align: right;
+}
+
+.ttCell {
+  min-height: 70px; padding: 3px; background: var(--surface); border-radius: var(--radius-sm);
+}
+
+.ttBlock {
+  padding: 8px 10px; border-radius: var(--radius-sm); height: 100%;
+  display: flex; flex-direction: column; gap: 2px;
+}
+
+.ttSubject { font-family: var(--font-display); font-weight: 700; font-size: 0.75rem; color: var(--text-primary); }
+.ttFaculty { font-size: 0.625rem; color: var(--text-secondary); }
+.ttRoom { font-size: 0.625rem; color: var(--text-tertiary); }
+
+.ttEmpty {
+  height: 100%; display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; color: var(--text-tertiary);
+}
+
+@media (max-width: 1024px) {
+  .configGrid { grid-template-columns: 1fr; }
+}

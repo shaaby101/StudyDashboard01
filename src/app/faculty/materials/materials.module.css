@@ -1,0 +1,75 @@
+.page { display: flex; flex-direction: column; gap: 24px; max-width: 900px; }
+.header h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 4px; }
+.header p { color: var(--text-secondary); font-size: 0.9375rem; }
+
+.subjectTabs { display: flex; gap: 8px; flex-wrap: wrap; }
+.tab {
+  padding: 8px 16px; border-radius: var(--radius-md); font-size: 0.8125rem; font-weight: 500;
+  background: var(--surface); border: 1px solid var(--border-subtle); cursor: pointer;
+  color: var(--text-secondary); transition: all var(--transition-fast);
+}
+.tab:hover { border-color: var(--accent); }
+.tab.active { background: var(--accent-light); color: var(--accent); border-color: var(--accent); font-weight: 600; }
+
+.uploadZone {
+  padding: 48px 24px; display: flex; flex-direction: column; align-items: center;
+  gap: 12px; text-align: center; cursor: pointer; border: 2px dashed var(--border-strong);
+  color: var(--text-tertiary); transition: all var(--transition-base);
+}
+.uploadZone:hover, .uploadZone.dragOver {
+  border-color: var(--accent); color: var(--accent); background: var(--accent-light);
+}
+.uploadZone h3 { font-size: 1rem; font-weight: 600; }
+.uploadZone p { font-size: 0.8125rem; }
+
+.successBanner {
+  display: flex; align-items: center; gap: 8px; padding: 12px 20px;
+  background: var(--success-light); color: var(--success); border-radius: var(--radius-lg);
+  font-weight: 600; font-size: 0.9375rem; animation: fadeIn 0.3s ease-out;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.filesCard { padding: 24px; }
+.filesCard h3 { font-size: 1rem; font-weight: 600; margin-bottom: 16px; }
+.emptyState { text-align: center; padding: 32px; color: var(--text-tertiary); }
+
+.fileList { display: flex; flex-direction: column; gap: 8px; }
+.fileItem {
+  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+  background: var(--surface); border-radius: var(--radius-md); border: 1px solid var(--border-subtle);
+  transition: all var(--transition-fast);
+}
+.fileItem:hover { border-color: var(--accent-glow); }
+
+.fileIcon {
+  width: 40px; height: 40px; min-width: 40px; border-radius: var(--radius-md);
+  background: var(--accent-light); color: var(--accent); display: flex;
+  align-items: center; justify-content: center;
+}
+
+.fileInfo { flex: 1; }
+.fileInfo h4 { font-size: 0.875rem; font-weight: 600; }
+.fileInfo span { font-size: 0.75rem; color: var(--text-tertiary); }
+
+.removeBtn {
+  width: 32px; height: 32px; border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-tertiary); cursor: pointer; border: none; background: none;
+  transition: all var(--transition-fast);
+}
+.removeBtn:hover { background: var(--danger-light); color: var(--danger); }
+
+.syllabusPreview { padding: 24px; }
+.syllabusPreview h3 { font-size: 1rem; font-weight: 600; margin-bottom: 16px; }
+
+.unitGrid { display: flex; flex-direction: column; gap: 12px; }
+.unitItem {
+  padding: 16px; background: var(--surface); border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+}
+.unitItem h4 { font-size: 0.875rem; font-weight: 600; margin-bottom: 10px; }
+.topicList { display: flex; flex-wrap: wrap; gap: 6px; }
+.topicChip {
+  padding: 4px 12px; background: var(--accent-light); color: var(--accent);
+  border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 500;
+}

@@ -1,0 +1,34 @@
+.page { display: flex; flex-direction: column; gap: 24px; max-width: 800px; }
+.header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.header h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 4px; }
+.header p { color: var(--text-secondary); font-size: 0.9375rem; }
+
+.successBanner {
+  display: flex; align-items: center; gap: 8px; padding: 12px 20px;
+  background: var(--success-light); color: var(--success); border-radius: var(--radius-lg);
+  font-weight: 600; font-size: 0.9375rem;
+}
+
+.form { padding: 24px; animation: fadeInUp 0.3s ease-out; }
+.form h3 { font-size: 1rem; font-weight: 600; margin-bottom: 20px; }
+.formGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.formActions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+.historyCard { padding: 24px; }
+.historyCard h3 { font-size: 1rem; font-weight: 600; margin-bottom: 16px; }
+
+.leaveList { display: flex; flex-direction: column; gap: 10px; }
+.leaveItem {
+  display: flex; align-items: center; gap: 16px; padding: 14px 16px;
+  background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border-subtle);
+}
+.leaveInfo { flex: 1; }
+.leaveInfo h4 { font-size: 0.875rem; font-weight: 600; font-family: var(--font-display); }
+.leaveInfo p { font-size: 0.8125rem; color: var(--text-tertiary); margin-top: 2px; }
+
+@media (max-width: 768px) {
+  .formGrid { grid-template-columns: 1fr; }
+  .header { flex-direction: column; }
+}
