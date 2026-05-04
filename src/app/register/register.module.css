@@ -70,6 +70,16 @@
   border: 1px solid rgba(30, 28, 23, 0.2);
   background: #fff;
   font-size: 14px;
+  color: var(--auth-ink);
+}
+
+.label input::placeholder,
+.label select {
+  color: var(--auth-ink);
+}
+
+.label select:invalid {
+  color: var(--auth-muted);
 }
 
 .error {

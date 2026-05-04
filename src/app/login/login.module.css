@@ -69,6 +69,11 @@
   border: 1px solid rgba(29, 27, 22, 0.2);
   background: #fff;
   font-size: 14px;
+  color: var(--auth-ink);
+}
+
+.label input::placeholder {
+  color: var(--auth-muted);
 }
 
 .error {

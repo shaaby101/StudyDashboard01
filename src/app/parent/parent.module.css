@@ -12,20 +12,222 @@
   color: var(--muted);
 }
 
-.card {
+.hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px 28px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--surface), var(--surface-elevated));
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  align-items: center;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--accent-light);
+  color: var(--accent);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.hero h2 {
+  margin: 12px 0 6px;
+}
+
+.hero p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.heroActions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.primaryAction,
+.secondaryAction {
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.primaryAction {
+  background: var(--accent);
+  color: #fff;
+}
+
+.secondaryAction {
+  border: 1px solid var(--border-strong);
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+}
+
+.summaryGrid {
   display: grid;
   gap: 16px;
-  padding: 24px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(244, 246, 250, 0.9));
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
-.card h3 {
-  margin: 0 0 6px;
+.summaryCard {
+  padding: 18px;
+  border-radius: 16px;
+  background: var(--surface-elevated);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-subtle);
+  display: grid;
+  gap: 6px;
 }
 
-.card p {
+.summaryCard span {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.summaryCard strong {
+  font-size: 24px;
+  color: var(--text-primary);
+}
+
+.summaryCard p {
   margin: 0;
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+.contentGrid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.panel {
+  background: var(--surface-elevated);
+  border-radius: 18px;
+  padding: 20px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-lg);
+  display: grid;
+  gap: 16px;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.panelHeader span {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.attendanceList {
+  display: grid;
+  gap: 14px;
+}
+
+.attendanceRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--accent-light);
+}
+
+.attendanceRow p {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.attendanceValue {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.scheduleList {
+  list-style: none;
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+}
+
+.scheduleItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border-subtle);
+}
+
+.scheduleItem p {
+  margin: 4px 0 0;
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+.scheduleMeta {
+  display: grid;
+  text-align: right;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.alertGrid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.alertCard {
+  padding: 18px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--accent-light), var(--info-light));
+  border: 1px solid var(--border-subtle);
+  display: grid;
+  gap: 8px;
+}
+
+.alertCard h4 {
+  margin: 0;
+}
+
+.alertCard p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.quickLinks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+@media (max-width: 720px) {
+  .hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .heroActions {
+    width: 100%;
+  }
 }
