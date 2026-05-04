@@ -35,13 +35,12 @@ const ROLE_PROFILES = {
   },
   parent: {
     id: 'PAR001',
-    name: 'Ananya Mehta',
-    email: 'ananya.mehta@campus.edu',
+    name: 'Rajesh Mehta',
+    email: 'rajesh.mehta@example.com',
     role: 'parent',
-    avatar: 'AM',
-    studentName: 'Arjun Mehta',
-    studentId: 'STU001',
-    department: 'Computer Science',
+    avatar: 'RM',
+    wardId: 'STU001',
+    wardName: 'Arjun Mehta',
   },
 };
 
@@ -188,7 +187,36 @@ export function AppProvider({ children }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [attendance, setAttendance] = useState(MOCK_ATTENDANCE);
   const [courses, setCourses] = useState(MOCK_COURSES);
+  const [studyHours, setStudyHours] = useState({
+    'STU001': { name: 'Arjun Mehta', hours: 12.5 },
+    'STU002': { name: 'Priya Patel', hours: 8.2 },
+    'STU003': { name: 'Rahul Kumar', hours: 5.5 },
+  });
+  
+  const logStudyTime = useCallback((studentId, studentName, minutes) => {
+    setStudyHours(prev => {
+      const current = prev[studentId] || { name: studentName, hours: 0 };
+      return {
+        ...prev,
+        [studentId]: {
+          ...current,
+          hours: current.hours + (minutes / 60)
+        }
+      };
+    });
+  }, []);
+
   const [syllabus, setSyllabus] = useState(MOCK_SYLLABUS);
+  const [appointments, setAppointments] = useState([
+    { id: 1, facultyId: 'FAC001', faculty: 'Dr. Priya Sharma', date: '2026-05-10', time: '10:00 AM', status: 'confirmed', subject: 'CS301 Progress', requesterName: 'Rajesh Mehta', requesterRole: 'parent', message: 'Looking forward to our meeting.' },
+    { id: 2, facultyId: 'FAC004', faculty: 'Dr. Sanjay Patel', date: '2026-05-12', time: '02:00 PM', status: 'pending', subject: 'General Performance', requesterName: 'Arjun Mehta', requesterRole: 'student' }
+  ]);
+  const [results, setResults] = useState([
+    { subject: 'CS301', name: 'Data Structures & Algorithms', midTerm: 85, final: 90, grade: 'A' },
+    { subject: 'CS302', name: 'Operating Systems', midTerm: 78, final: 82, grade: 'B+' },
+    { subject: 'CS303', name: 'Database Management Systems', midTerm: 92, final: 95, grade: 'A+' },
+    { subject: 'CS304', name: 'Computer Networks', midTerm: 65, final: 70, grade: 'B' },
+  ]);
   const [materials, setMaterials] = useState([
     { id: 1, name: 'DSA_Unit1_Notes.pdf', size: '2.4 MB', date: '2026-04-28', subject: 'CS301' },
     { id: 2, name: 'DBMS_ER_Diagram_Examples.pdf', size: '1.8 MB', date: '2026-04-25', subject: 'CS303' },
@@ -338,6 +366,18 @@ export function AppProvider({ children }) {
     setUser(null);
   }, []);
 
+  const addAppointment = useCallback((apt) => {
+    setAppointments(prev => [apt, ...prev]);
+    setNotifications(prev => [
+      { id: Date.now(), type: 'info', message: `New appointment request from ${apt.requesterName} (${apt.requesterRole})`, time: 'Just now', read: false },
+      ...prev
+    ]);
+  }, []);
+
+  const respondToAppointment = useCallback((id, status, message) => {
+    setAppointments(prev => prev.map(apt => apt.id === id ? { ...apt, status, message } : apt));
+  }, []);
+
   const enrollCourse = useCallback((courseId) => {
     setUser(prev => {
       if (prev?.role !== 'student' || prev.enrolledCourses?.includes(courseId)) return prev;
@@ -463,6 +503,12 @@ export function AppProvider({ children }) {
     addForumQuestion,
     addForumAnswer,
     promptAiAnswer,
+    appointments,
+    addAppointment,
+    respondToAppointment,
+    results,
+    studyHours,
+    logStudyTime,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

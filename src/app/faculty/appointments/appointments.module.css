@@ -1,0 +1,33 @@
+.page { display: flex; flex-direction: column; gap: 24px; max-width: 900px; }
+.header h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 4px; }
+.header p { color: var(--text-secondary); font-size: 0.9375rem; }
+
+.appointmentsList { display: flex; flex-direction: column; gap: 16px; margin-top: 8px; }
+.emptyState { padding: 40px; text-align: center; color: var(--text-tertiary); background: var(--surface); border-radius: var(--radius-lg); border: 1px dashed var(--border-subtle); }
+.aptCard { padding: 24px; border-radius: var(--radius-lg); display: flex; flex-direction: column; gap: 16px; }
+
+.aptHeader { display: flex; justify-content: space-between; align-items: flex-start; }
+.aptFaculty { display: flex; align-items: center; gap: 12px; }
+.aptAvatar { width: 48px; height: 48px; border-radius: 50%; background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; }
+.aptFaculty h4 { font-size: 1.125rem; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.roleBadge { font-size: 0.6875rem; text-transform: capitalize; padding: 2px 6px; background: var(--bg-secondary); color: var(--text-secondary); border-radius: 4px; }
+.aptFaculty p { font-size: 0.875rem; color: var(--text-secondary); font-weight: 500; }
+
+.statusBadge { padding: 4px 10px; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.statusBadge.confirmed { background: rgba(0, 184, 148, 0.1); color: #00b894; }
+.statusBadge.pending { background: rgba(253, 203, 110, 0.1); color: #fdcb6e; }
+.statusBadge.rejected { background: rgba(255, 118, 117, 0.1); color: #d63031; }
+
+.aptMeta { display: flex; gap: 24px; padding-top: 16px; border-top: 1px solid var(--border-subtle); }
+.aptMetaItem { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 0.9375rem; font-weight: 500; }
+
+.responseArea { margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--border-subtle); display: flex; flex-direction: column; gap: 12px; }
+.replyInput { padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); background: var(--bg-primary); color: var(--text-primary); font-size: 0.875rem; outline: none; width: 100%; }
+.actionBtns { display: flex; gap: 12px; }
+.approveBtn, .rejectBtn { flex: 1; padding: 10px; border: none; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
+.approveBtn { background: #00b894; color: white; }
+.approveBtn:hover { background: #00a080; }
+.rejectBtn { background: var(--surface); color: var(--text-primary); border: 1px solid var(--border-subtle); }
+.rejectBtn:hover { background: #d63031; color: white; border-color: #d63031; }
+
+.facultyMessage { margin-top: 16px; padding: 12px 16px; background: rgba(var(--accent-rgb), 0.05); border-left: 3px solid var(--accent); border-radius: var(--radius-sm); font-size: 0.875rem; color: var(--text-primary); }

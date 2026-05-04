@@ -17,6 +17,15 @@ const ROLES = [
     path: '/student',
   },
   {
+    key: 'parent',
+    title: 'Parent',
+    description: "Track your ward's academic progress and schedule appointments",
+    icon: IconUsers,
+    features: ['Track Attendance', 'View Results', 'Faculty Appointments'],
+    gradient: 'linear-gradient(135deg, #0984E3, #74B9FF)',
+    path: '/parent',
+  },
+  {
     key: 'faculty',
     title: 'Faculty',
     description: 'Manage attendance, schedules, and upload course materials',
@@ -33,15 +42,6 @@ const ROLES = [
     features: ['Campus Analytics', 'Faculty Overview', 'AI Timetable'],
     gradient: 'linear-gradient(135deg, #E17055, #FDCB6E)',
     path: '/admin',
-  },
-  {
-    key: 'parent',
-    title: 'Parent',
-    description: 'Track attendance, updates, and student progress',
-    icon: IconUsers,
-    features: ['Student Progress', 'Attendance Alerts', 'Campus Updates'],
-    gradient: 'linear-gradient(135deg, #0984E3, #74B9FF)',
-    path: '/parent',
   },
 ];
 

@@ -9,13 +9,15 @@ import {
 } from './Icons';
 import styles from './Sidebar.module.css';
 
-const NAV_ITEMS = {
+export const NAV_ITEMS = {
   student: [
     { label: 'Dashboard', icon: IconDashboard, path: '/student' },
     { label: 'Attendance', icon: IconChart, path: '/student/attendance' },
     { label: 'AI Companion', icon: IconBrain, path: '/student/ai' },
+    { label: 'Study Corner', icon: IconBrain, path: '/student/study-corner' },
     { label: 'Courses', icon: IconBook, path: '/student/courses' },
     { label: 'Schedule', icon: IconCalendar, path: '/student/schedule' },
+    { label: 'Appointments', icon: IconCalendar, path: '/student/appointments' },
     { label: 'Forum', icon: IconGrid, path: '/student/forum' },
   ],
   faculty: [
@@ -23,6 +25,7 @@ const NAV_ITEMS = {
     { label: 'Mark Attendance', icon: IconUsers, path: '/faculty/attendance' },
     { label: 'My Schedule', icon: IconCalendar, path: '/faculty/schedule' },
     { label: 'Materials', icon: IconUpload, path: '/faculty/materials' },
+    { label: 'Appointments', icon: IconCalendar, path: '/faculty/appointments' },
     { label: 'Forum', icon: IconGrid, path: '/faculty/forum' },
     { label: 'Leave', icon: IconMail, path: '/faculty/leave' },
   ],
@@ -35,6 +38,7 @@ const NAV_ITEMS = {
   ],
   parent: [
     { label: 'Dashboard', icon: IconDashboard, path: '/parent' },
+    { label: 'Appointments', icon: IconCalendar, path: '/parent/appointments' },
   ],
 };
 
@@ -46,13 +50,7 @@ export default function Sidebar() {
   if (!user) return null;
 
   const items = NAV_ITEMS[user.role] || [];
-  const roleLabel = user.role === 'admin'
-    ? 'Administrator'
-    : user.role === 'faculty'
-      ? 'Faculty'
-      : user.role === 'parent'
-        ? 'Parent'
-        : 'Student';
+  const roleLabel = user.role === 'admin' ? 'Administrator' : user.role === 'faculty' ? 'Faculty' : user.role === 'parent' ? 'Parent' : 'Student';
 
   return (
     <>

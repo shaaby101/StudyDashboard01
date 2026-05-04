@@ -52,12 +52,26 @@ export default function ForumView({ requiredRole }) {
     setReplyContent({ ...replyContent, [questionId]: '' });
   };
 
-  const handleAiRequest = (questionId, questionText) => {
+  const handleAiRequest = async (questionId, questionText) => {
     promptAiAnswer(selectedCourse, questionId);
-    setTimeout(() => {
-      const answer = generateAIForumAnswer(questionText, selectedCourse, syllabus);
-      addForumAnswer(selectedCourse, questionId, answer, true);
-    }, 1000);
+    try {
+      const course = syllabus[selectedCourse];
+      const systemPrompt = `You are a helpful AI professor for the course "${course?.title || 'Unknown Course'}". 
+      The course syllabus contains these units and topics: ${JSON.stringify(course?.units || [])}.
+      A student has asked a question on the class forum. Provide a clear, accurate, and encouraging answer based heavily on the syllabus context. Format using markdown.`;
+
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: questionText, systemPrompt })
+      });
+      const data = await res.json();
+      
+      if (!res.ok) throw new Error(data.error || "Failed to get AI response");
+      addForumAnswer(selectedCourse, questionId, data.answer, true);
+    } catch (err) {
+      addForumAnswer(selectedCourse, questionId, `⚠️ **Error:** ${err.message}`, true);
+    }
   };
 
   return (

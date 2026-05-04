@@ -1,5 +1,6 @@
 'use client';
 
+
 import DashboardLayout from '@/components/DashboardLayout';
 import { useApp } from '@/context/AppContext';
 import AnimatedCounter from '@/components/AnimatedCounter';
@@ -9,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import styles from './admin.module.css';
 
 export default function AdminDashboard() {
-  const { facultyList } = useApp();
+  const { facultyList, studyHours, appointments } = useApp();
   const router = useRouter();
 
   const totalStudents = 1250;
@@ -159,6 +160,64 @@ export default function AdminDashboard() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Study Hours & Appointments Row */}
+        <div className={styles.mainGrid} style={{ marginTop: 24, marginBottom: 24 }}>
+          {/* Study Corner Engagement */}
+          <div className={`glass-card-static ${styles.card}`}>
+            <div className={styles.cardHeader}>
+              <h3>Study Corner Top Performers</h3>
+            </div>
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Student Name</th>
+                  <th>Hours Logged</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.values(studyHours || {})
+                  .sort((a, b) => b.hours - a.hours)
+                  .slice(0, 5)
+                  .map((student, idx) => (
+                  <tr key={idx}>
+                    <td><strong>{student.name}</strong></td>
+                    <td>{student.hours.toFixed(1)} hrs</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Campus Appointments Overview */}
+          <div className={`glass-card-static ${styles.card}`}>
+            <div className={styles.cardHeader}>
+              <h3>Faculty Appointments Overview</h3>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {(appointments || []).length === 0 ? (
+                <p style={{ color: 'var(--text-tertiary)', fontSize: '0.875rem' }}>No active appointments.</p>
+              ) : (
+                appointments.map(apt => (
+                  <div key={apt.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', background: 'var(--surface)', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
+                    <div>
+                      <strong style={{ fontSize: '0.875rem', color: 'var(--text-primary)' }}>{apt.faculty}</strong>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                        with {apt.requesterName} ({apt.requesterRole})
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <span className={`badge ${apt.status === 'confirmed' ? 'badge-success' : apt.status === 'pending' ? 'badge-warning' : 'badge-danger'}`} style={{ fontSize: '0.625rem', marginBottom: '4px', display: 'inline-block' }}>
+                        {apt.status}
+                      </span>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{apt.date} • {apt.time}</div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Quick Actions */}

@@ -6,41 +6,6 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { IconMicrophone, IconSend, IconBrain, IconBook, IconChevronDown, IconX, IconRefresh } from '@/components/Icons';
 import styles from './ai.module.css';
 
-// Simulated AI responses based on syllabus context
-function generateAIResponse(query, courseId, syllabus) {
-  const q = query.toLowerCase();
-  const course = syllabus[courseId];
-  if (!course) return "Please select a course to start asking questions.";
-
-  const allTopics = course.units.flatMap(u => u.topics);
-
-  // Detect intent
-  if (q.includes('summarize') || q.includes('summary') || q.includes('explain') || q.includes('what is') || q.includes('tell me about')) {
-    const matchedTopic = allTopics.find(t => q.includes(t.toLowerCase()));
-    if (matchedTopic) {
-      return `## ${matchedTopic}\n\n**${matchedTopic}** is a key concept in ${course.title}. Here's a comprehensive breakdown:\n\n### Key Points\n- ${matchedTopic} is fundamental to understanding modern ${course.title.toLowerCase()}\n- It builds upon basic principles and extends into practical applications\n- Understanding this concept is crucial for exam preparation\n\n### How It Connects\nThis topic connects to several other areas in your syllabus, including related concepts in the same unit.\n\n> 💡 *Tip: Try asking me to generate a quiz on this topic to test your understanding!*`;
-    }
-    return `## ${course.title} — Overview\n\nThis course covers ${course.units.length} major units:\n\n${course.units.map((u, i) => `**${i + 1}. ${u.name}**\n   Topics: ${u.topics.join(', ')}`).join('\n\n')}\n\n> Ask me about any specific topic for a detailed explanation!`;
-  }
-
-  if (q.includes('quiz') || q.includes('test') || q.includes('practice') || q.includes('mcq')) {
-    const unit = course.units[Math.floor(Math.random() * course.units.length)];
-    return `## 📝 Quick Quiz — ${unit.name}\n\n**Q1.** Which of the following is NOT a concept covered in ${unit.name}?\n- a) ${unit.topics[0]}\n- b) ${unit.topics[1] || 'None'}\n- c) Quantum Computing\n- d) ${unit.topics[2] || 'All of the above'}\n\n**Q2.** True or False: ${unit.topics[0]} is considered a fundamental concept in ${course.title}.\n\n**Q3.** Briefly explain the relationship between ${unit.topics[0]} and ${unit.topics[1] || unit.topics[0]}.\n\n---\n*Answers: Q1: c, Q2: True*\n\n> Want more questions? Just ask for another quiz!`;
-  }
-
-  if (q.includes('topic') || q.includes('syllabus') || q.includes('unit') || q.includes('cover')) {
-    return `## 📚 ${course.title} — Syllabus Breakdown\n\n${course.units.map((u, i) => `### ${u.name}\n${u.topics.map(t => `- ${t}`).join('\n')}`).join('\n\n')}\n\n> Ask me to explain any topic or generate a quiz for any unit!`;
-  }
-
-  if (q.includes('help') || q.includes('what can you do') || q.includes('how') || q === '') {
-    return `## 🤖 How I Can Help\n\nI'm your AI study companion for **${course.title}**. Here's what I can do:\n\n- 📖 **Explain concepts** — "Explain Binary Trees" or "What is TCP?"\n- 📝 **Generate quizzes** — "Give me a quiz on Unit 2"\n- 📚 **Syllabus overview** — "Show me the syllabus"\n- 🔗 **Topic connections** — "How does X relate to Y?"\n- 📊 **Summaries** — "Summarize Unit 3"\n\n> I work within your course syllabus to ensure academic relevance!`;
-  }
-
-  // Default contextual response
-  const randomUnit = course.units[Math.floor(Math.random() * course.units.length)];
-  return `Based on the **${course.title}** syllabus, here's what I found:\n\n### Related Concepts\nYour query touches on topics covered in **${randomUnit.name}**:\n\n${randomUnit.topics.map(t => `- **${t}** — A core concept you should review`).join('\n')}\n\n### Study Tips\n1. Start with the fundamentals of this unit\n2. Practice with examples and problems\n3. Try to connect concepts across different units\n\n> Would you like me to generate a quiz or provide a detailed explanation?`;
-}
-
 export default function AICompanion() {
   const { courses, syllabus, user } = useApp();
   const [selectedCourse, setSelectedCourse] = useState('');
@@ -85,18 +50,39 @@ export default function AICompanion() {
     setInput('');
     setIsTyping(true);
 
-    // Simulate AI thinking delay
-    await new Promise(r => setTimeout(r, 800 + Math.random() * 1200));
+    try {
+      const course = syllabus[selectedCourse];
+      const systemPrompt = `You are a personalized AI study companion for a student taking the course "${course?.title || 'Unknown Course'}". 
+      Here is the course syllabus: ${JSON.stringify(course?.units || [])}.
+      The student will ask questions, request quizzes, or ask for summaries. Provide highly educational, accurate, and encouraging answers formatted beautifully in Markdown (use ## headings, bolding, and lists). Stay relevant to the syllabus.`;
 
-    const response = generateAIResponse(text, selectedCourse, syllabus);
-    const aiMsg = {
-      id: Date.now() + 1,
-      role: 'ai',
-      content: response,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    };
-    setMessages(prev => [...prev, aiMsg]);
-    setIsTyping(false);
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, systemPrompt })
+      });
+      const data = await res.json();
+      
+      if (!res.ok) throw new Error(data.error || "Failed to fetch AI response");
+
+      const aiMsg = {
+        id: Date.now() + 1,
+        role: 'ai',
+        content: data.answer,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      setMessages(prev => [...prev, aiMsg]);
+    } catch (err) {
+      const errorMsg = {
+        id: Date.now() + 1,
+        role: 'ai',
+        content: `⚠️ **Error:** ${err.message}. Make sure your GROQ_API_KEY is configured correctly.`,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      setMessages(prev => [...prev, errorMsg]);
+    } finally {
+      setIsTyping(false);
+    }
   }, [selectedCourse, syllabus]);
 
   const handleSubmit = (e) => {
