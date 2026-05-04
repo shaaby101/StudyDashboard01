@@ -27,6 +27,26 @@
   box-shadow: 0 24px 60px rgba(29, 27, 22, 0.12);
 }
 
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--auth-muted);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 24px;
+  transition: all 0.2s;
+  padding: 4px 8px;
+  margin-left: -8px;
+  border-radius: 8px;
+}
+
+.backBtn:hover {
+  color: var(--auth-accent-dark);
+  background: rgba(29, 27, 22, 0.04);
+}
+
 .header h1 {
   margin: 12px 0 6px;
   font-size: 32px;

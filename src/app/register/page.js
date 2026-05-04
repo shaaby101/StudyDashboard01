@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styles from './register.module.css';
+import { IconChevronLeft } from '@/components/Icons';
 
 import { Suspense } from 'react';
 
@@ -53,6 +54,10 @@ function RegisterContent() {
     <div className={styles.page}>
       <div className={styles.backdrop} />
       <div className={styles.card}>
+        <Link href="/" className={styles.backBtn}>
+          <IconChevronLeft size={18} />
+          <span>Back to home</span>
+        </Link>
         <div className={styles.header}>
           <span className={styles.tag}>Create access</span>
           <h1>Register</h1>

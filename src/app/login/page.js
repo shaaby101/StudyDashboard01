@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styles from './login.module.css';
+import { IconChevronLeft } from '@/components/Icons';
 
 import { Suspense } from 'react';
 
@@ -43,6 +44,10 @@ function LoginContent() {
     <div className={styles.page}>
       <div className={styles.backdrop} />
       <div className={styles.card}>
+        <Link href="/" className={styles.backBtn}>
+          <IconChevronLeft size={18} />
+          <span>Back to home</span>
+        </Link>
         <div className={styles.header}>
           <span className={styles.tag}>Studesh Access</span>
           <h1>Sign in</h1>
