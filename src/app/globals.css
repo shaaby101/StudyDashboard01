@@ -96,6 +96,14 @@
 
   /* Grain overlay */
   --grain-opacity: 0.03;
+
+  /* Auth views */
+  --auth-bg: #f4f1ea;
+  --auth-ink: #1d1b16;
+  --auth-muted: #6c6a63;
+  --auth-card: #fffdf8;
+  --auth-accent: #a65f2c;
+  --auth-accent-dark: #7d421a;
 }
 
 /* ===== Dark Mode ===== */

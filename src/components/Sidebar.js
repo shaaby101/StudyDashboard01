@@ -33,6 +33,9 @@ const NAV_ITEMS = {
     { label: 'Timetable AI', icon: IconWand, path: '/admin/timetable' },
     { label: 'Departments', icon: IconBuilding, path: '/admin/departments' },
   ],
+  parent: [
+    { label: 'Dashboard', icon: IconDashboard, path: '/parent' },
+  ],
 };
 
 export default function Sidebar() {
@@ -43,7 +46,13 @@ export default function Sidebar() {
   if (!user) return null;
 
   const items = NAV_ITEMS[user.role] || [];
-  const roleLabel = user.role === 'admin' ? 'Administrator' : user.role === 'faculty' ? 'Faculty' : 'Student';
+  const roleLabel = user.role === 'admin'
+    ? 'Administrator'
+    : user.role === 'faculty'
+      ? 'Faculty'
+      : user.role === 'parent'
+        ? 'Parent'
+        : 'Student';
 
   return (
     <>

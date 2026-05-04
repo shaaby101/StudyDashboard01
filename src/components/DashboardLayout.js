@@ -8,21 +8,22 @@ import { IconBell, IconSearch, IconMenu } from '@/components/Icons';
 import styles from './DashboardLayout.module.css';
 
 export default function DashboardLayout({ children, requiredRole }) {
-  const { user, sidebarCollapsed, setSidebarCollapsed, notifications } = useApp();
+  const { user, loadingUser, sidebarCollapsed, setSidebarCollapsed, notifications } = useApp();
   const router = useRouter();
   const pathname = usePathname();
   const [showNotifications, setShowNotifications] = useState(false);
   const unreadCount = notifications.filter(n => !n.read).length;
 
   useEffect(() => {
+    if (loadingUser) return;
     if (!user) {
-      router.push('/');
+      router.replace('/login');
     } else if (requiredRole && user.role !== requiredRole) {
-      router.push(`/${user.role}`);
+      router.replace(`/${user.role}`);
     }
-  }, [user, requiredRole, router]);
+  }, [user, requiredRole, router, loadingUser]);
 
-  if (!user || (requiredRole && user.role !== requiredRole)) {
+  if (loadingUser || !user || (requiredRole && user.role !== requiredRole)) {
     return (
       <div className={styles.loading}>
         <div className={styles.loadingSpinner} />

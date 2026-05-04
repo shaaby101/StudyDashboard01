@@ -5,7 +5,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 const AppContext = createContext();
 
 // Mock data
-const MOCK_USERS = {
+const ROLE_PROFILES = {
   student: {
     id: 'STU001',
     name: 'Arjun Mehta',
@@ -33,7 +33,44 @@ const MOCK_USERS = {
     avatar: 'RK',
     designation: 'Principal',
   },
+  parent: {
+    id: 'PAR001',
+    name: 'Ananya Mehta',
+    email: 'ananya.mehta@campus.edu',
+    role: 'parent',
+    avatar: 'AM',
+    studentName: 'Arjun Mehta',
+    studentId: 'STU001',
+    department: 'Computer Science',
+  },
 };
+
+const DEMO_USERS = [
+  {
+    email: 'student@demo.edu',
+    password: 'studesh123',
+    role: 'student',
+    name: 'Arjun Mehta',
+  },
+  {
+    email: 'faculty@demo.edu',
+    password: 'studesh123',
+    role: 'faculty',
+    name: 'Dr. Priya Sharma',
+  },
+  {
+    email: 'admin@demo.edu',
+    password: 'studesh123',
+    role: 'admin',
+    name: 'Prof. Rajesh Kumar',
+  },
+  {
+    email: 'parent@demo.edu',
+    password: 'studesh123',
+    role: 'parent',
+    name: 'Ananya Mehta',
+  },
+];
 
 const MOCK_COURSES = [
   { id: 'CS301', name: 'Data Structures & Algorithms', code: 'CS301', faculty: 'Dr. Priya Sharma', credits: 4 },
@@ -147,6 +184,7 @@ const MOCK_SYLLABUS = {
 export function AppProvider({ children }) {
   const [theme, setTheme] = useState('light');
   const [user, setUser] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [attendance, setAttendance] = useState(MOCK_ATTENDANCE);
   const [courses, setCourses] = useState(MOCK_COURSES);
@@ -179,16 +217,52 @@ export function AppProvider({ children }) {
     const savedTheme = localStorage.getItem('studesh-theme') || 'light';
     setTheme(savedTheme);
     document.documentElement.setAttribute('data-theme', savedTheme);
-
-    const savedUser = localStorage.getItem('studesh-user');
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (e) {
-        localStorage.removeItem('studesh-user');
-      }
-    }
   }, []);
+
+  const applyUserProfile = useCallback((serverUser) => {
+    if (!serverUser) return null;
+    const profile = ROLE_PROFILES[serverUser.role] || {};
+    const initials = serverUser.name
+      ? serverUser.name
+          .split(' ')
+          .filter(Boolean)
+          .slice(0, 2)
+          .map(part => part[0])
+          .join('')
+          .toUpperCase()
+      : 'U';
+    return {
+      ...profile,
+      ...serverUser,
+      avatar: profile.avatar || initials,
+    };
+  }, []);
+
+  const refreshUser = useCallback(async () => {
+    try {
+      const res = await fetch('/api/auth/me');
+      if (res.ok) {
+        const data = await res.json();
+        setUser(applyUserProfile(data.user));
+        return;
+      }
+    } catch (error) {
+      // Ignore fetch failures and treat as logged out.
+    }
+    setUser(null);
+  }, [applyUserProfile]);
+
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      await refreshUser();
+      if (active) setLoadingUser(false);
+    };
+    load();
+    return () => {
+      active = false;
+    };
+  }, [refreshUser]);
 
   const toggleTheme = useCallback(() => {
     setTheme(prev => {
@@ -199,23 +273,75 @@ export function AppProvider({ children }) {
     });
   }, []);
 
-  const login = useCallback((role) => {
-    const userData = MOCK_USERS[role];
-    setUser(userData);
-    localStorage.setItem('studesh-user', JSON.stringify(userData));
-  }, []);
+  const login = useCallback(async ({ email, password }) => {
+    const normalizedEmail = String(email || '').trim().toLowerCase();
+    const demoUser = DEMO_USERS.find(
+      (account) =>
+        account.email.toLowerCase() === normalizedEmail &&
+        account.password === String(password || '')
+    );
 
-  const logout = useCallback(() => {
+    if (demoUser) {
+      const demoProfile = applyUserProfile({
+        id: `${demoUser.role.toUpperCase()}-DEMO`,
+        name: demoUser.name,
+        email: demoUser.email,
+        role: demoUser.role,
+      });
+      setUser(demoProfile);
+      return { ok: true, user: demoProfile, demo: true };
+    }
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        return { ok: false, error: data?.error || 'Login failed.' };
+      }
+      const nextUser = applyUserProfile(data.user);
+      setUser(nextUser);
+      return { ok: true, user: nextUser };
+    } catch (error) {
+      return { ok: false, error: 'Login failed.' };
+    }
+  }, [applyUserProfile]);
+
+  const register = useCallback(async ({ name, email, password, role }) => {
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, role }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        return { ok: false, error: data?.error || 'Registration failed.' };
+      }
+      const nextUser = applyUserProfile(data.user);
+      setUser(nextUser);
+      return { ok: true, user: nextUser };
+    } catch (error) {
+      return { ok: false, error: 'Registration failed.' };
+    }
+  }, [applyUserProfile]);
+
+  const logout = useCallback(async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (error) {
+      // Ignore logout failures.
+    }
     setUser(null);
-    localStorage.removeItem('studesh-user');
   }, []);
 
   const enrollCourse = useCallback((courseId) => {
     setUser(prev => {
       if (prev?.role !== 'student' || prev.enrolledCourses?.includes(courseId)) return prev;
-      const updated = { ...prev, enrolledCourses: [...(prev.enrolledCourses || []), courseId] };
-      localStorage.setItem('studesh-user', JSON.stringify(updated));
-      return updated;
+      return { ...prev, enrolledCourses: [...(prev.enrolledCourses || []), courseId] };
     });
   }, []);
 
@@ -224,9 +350,7 @@ export function AppProvider({ children }) {
     setSyllabus(prev => ({ ...prev, [course.id]: courseSyllabus }));
     setUser(prev => {
       if (prev?.role === 'faculty') {
-        const updated = { ...prev, subjects: [...(prev.subjects || []), course.id] };
-        localStorage.setItem('studesh-user', JSON.stringify(updated));
-        return updated;
+        return { ...prev, subjects: [...(prev.subjects || []), course.id] };
       }
       return prev;
     });
@@ -315,7 +439,9 @@ export function AppProvider({ children }) {
     theme,
     toggleTheme,
     user,
+    loadingUser,
     login,
+    register,
     logout,
     sidebarCollapsed,
     setSidebarCollapsed,

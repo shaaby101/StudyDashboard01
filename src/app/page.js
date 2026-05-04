@@ -34,10 +34,19 @@ const ROLES = [
     gradient: 'linear-gradient(135deg, #E17055, #FDCB6E)',
     path: '/admin',
   },
+  {
+    key: 'parent',
+    title: 'Parent',
+    description: 'Track attendance, updates, and student progress',
+    icon: IconUsers,
+    features: ['Student Progress', 'Attendance Alerts', 'Campus Updates'],
+    gradient: 'linear-gradient(135deg, #0984E3, #74B9FF)',
+    path: '/parent',
+  },
 ];
 
 export default function LandingPage() {
-  const { login, user, theme, toggleTheme } = useApp();
+  const { user, theme, toggleTheme } = useApp();
   const router = useRouter();
   const [hoveredRole, setHoveredRole] = useState(null);
   const [loaded, setLoaded] = useState(false);
@@ -50,8 +59,7 @@ export default function LandingPage() {
   }, [user, router]);
 
   const handleRoleSelect = (role) => {
-    login(role.key);
-    router.push(role.path);
+    router.push(`/login?role=${role.key}`);
   };
 
   if (user) return null;
