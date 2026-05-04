@@ -110,27 +110,33 @@ export default function TimetableGenerator() {
   const exportCSV = () => {
     if (!generated) return;
     const days = config.workingDays;
-    const headers = ['Time', ...days];
+
+    // Header row
+    const headers = ['Time Slot', ...days];
     const rows = [headers];
 
+    // One row per time slot; each day cell has Subject / Faculty / Room on separate lines
     generated.slots.forEach((slot, si) => {
       const row = [`${slot.start} - ${slot.end}`];
       days.forEach(day => {
         const cell = generated.timetable[day]?.[si];
         if (cell && !cell.empty) {
-          row.push(`${cell.subject} | ${cell.faculty} | ${cell.room}`);
+          // Newlines inside a quoted CSV cell render as separate lines in Excel
+          row.push(`${cell.subject}\n${cell.faculty}\n${cell.room}`);
         } else {
-          row.push('-');
+          row.push('Free');
         }
       });
       rows.push(row);
     });
 
-    const csvContent = rows
-      .map(row => row.map(val => `"${String(val).replace(/"/g, '""')}"`).join(','))
-      .join('\n');
+    // Wrap every value in quotes; escape inner quotes by doubling them
+    const escape = (val) => `"${String(val).replace(/"/g, '""')}"`;
+    const csvContent = rows.map(row => row.map(escape).join(',')).join('\r\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    // UTF-8 BOM ensures Excel opens the file with correct encoding
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
