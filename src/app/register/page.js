@@ -68,6 +68,7 @@ function RegisterContent() {
               onChange={(event) => setName(event.target.value)}
               placeholder="Your full name"
               required
+              autoComplete="name"
             />
           </label>
           <label className={styles.label}>
@@ -78,6 +79,7 @@ function RegisterContent() {
               onChange={(event) => setEmail(event.target.value)}
               placeholder="you@campus.edu"
               required
+              autoComplete="email"
             />
           </label>
           <label className={styles.label}>
@@ -88,6 +90,7 @@ function RegisterContent() {
               onChange={(event) => setPassword(event.target.value)}
               placeholder="Create a password"
               required
+              autoComplete="new-password"
             />
           </label>
           <label className={styles.label}>

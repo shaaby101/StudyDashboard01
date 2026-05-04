@@ -58,6 +58,7 @@ function LoginContent() {
               onChange={(event) => setEmail(event.target.value)}
               placeholder="you@campus.edu"
               required
+              autoComplete="email"
             />
           </label>
           <label className={styles.label}>
@@ -68,6 +69,7 @@ function LoginContent() {
               onChange={(event) => setPassword(event.target.value)}
               placeholder="Enter your password"
               required
+              autoComplete="current-password"
             />
           </label>
 
