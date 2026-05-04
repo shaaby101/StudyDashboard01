@@ -6,7 +6,9 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styles from './login.module.css';
 
-export default function LoginPage() {
+import { Suspense } from 'react';
+
+function LoginContent() {
   const { login, user, loadingUser } = useApp();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -82,5 +84,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginContent />
+    </Suspense>
   );
 }

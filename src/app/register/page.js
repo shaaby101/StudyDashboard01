@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styles from './register.module.css';
 
+import { Suspense } from 'react';
+
 const ROLE_OPTIONS = [
   { value: 'student', label: 'Student' },
   { value: 'faculty', label: 'Faculty' },
@@ -13,7 +15,7 @@ const ROLE_OPTIONS = [
   { value: 'parent', label: 'Parent' },
 ];
 
-export default function RegisterPage() {
+function RegisterContent() {
   const { register, user, loadingUser } = useApp();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -112,5 +114,13 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterContent />
+    </Suspense>
   );
 }
