@@ -276,3 +276,11 @@
     display: block;
   }
 }
+
+@media print {
+  .sidebar,
+  .collapseBtn,
+  .mobileOverlay {
+    display: none !important;
+  }
+}

@@ -2,7 +2,7 @@
 
 import DashboardLayout from '@/components/DashboardLayout';
 import React, { useState } from 'react';
-import { IconWand, IconPlus, IconX, IconDownload, IconRefresh, IconCheck } from '@/components/Icons';
+import { IconWand, IconPlus, IconX, IconDownload, IconRefresh, IconCheck, IconPrint } from '@/components/Icons';
 import styles from './timetable.module.css';
 
 const DEFAULT_CONFIG = {
@@ -301,6 +301,9 @@ export default function TimetableGenerator() {
               <div className={styles.resultActions}>
                 <button className="btn btn-secondary btn-sm" onClick={handleGenerate}>
                   <IconRefresh size={14} /> Regenerate
+                </button>
+                <button className="btn btn-secondary btn-sm" onClick={() => window.print()}>
+                  <IconPrint size={14} /> Print
                 </button>
                 <button className="btn btn-primary btn-sm" onClick={exportCSV}>
                   <IconDownload size={14} /> Export CSV

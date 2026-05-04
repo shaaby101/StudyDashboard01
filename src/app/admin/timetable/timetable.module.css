@@ -91,3 +91,129 @@
 @media (max-width: 1024px) {
   .configGrid { grid-template-columns: 1fr; }
 }
+
+/* ─── Print Styles ─────────────────────────────────── */
+@media print {
+  /* Hide UI chrome */
+  .configGrid,
+  .header,
+  .resultActions {
+    display: none !important;
+  }
+
+  .resultCard {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  .resultHeader {
+    margin-bottom: 12px !important;
+  }
+
+  .resultHeader h3 {
+    font-size: 1.1rem !important;
+    color: #000 !important;
+  }
+
+  /* Grid: use border-right + border-bottom on every cell,
+     and border-left + border-top on the container to form
+     a fully collapsed border table look */
+  .timetableGrid {
+    display: grid;
+    grid-template-columns: 80px repeat(5, 1fr);
+    gap: 0;
+    width: 100%;
+    min-width: unset;
+    border-top: 2px solid #222;
+    border-left: 2px solid #222;
+  }
+
+  .ttCorner,
+  .ttDayHeader,
+  .ttTimeCell,
+  .ttCell {
+    border-right: 1px solid #555;
+    border-bottom: 1px solid #555;
+    padding: 6px 8px;
+    box-sizing: border-box;
+  }
+
+  /* Header row */
+  .ttDayHeader {
+    background: #1a1a2e !important;
+    color: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-weight: 700;
+    font-size: 0.8125rem;
+    text-align: center;
+    border-right: 1px solid #444;
+    border-bottom: 2px solid #222;
+  }
+
+  .ttCorner {
+    background: #1a1a2e !important;
+    color: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    border-right: 1px solid #444;
+    border-bottom: 2px solid #222;
+  }
+
+  /* Time column */
+  .ttTimeCell {
+    background: #f0f0f0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: #111 !important;
+    text-align: center;
+    border-right: 2px solid #333;
+  }
+
+  /* Data cells */
+  .ttCell {
+    background: #fff !important;
+    min-height: 56px;
+  }
+
+  .ttBlock {
+    padding: 4px 6px;
+    border-left: 3px solid #333 !important;
+    background: #f7f7f7 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .ttSubject {
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    color: #000 !important;
+  }
+
+  .ttFaculty {
+    font-size: 0.625rem !important;
+    color: #333 !important;
+  }
+
+  .ttRoom {
+    font-size: 0.5625rem !important;
+    color: #555 !important;
+    font-style: italic;
+  }
+
+  .ttEmpty {
+    color: #bbb !important;
+    font-size: 0.75rem;
+    text-align: center;
+  }
+}
