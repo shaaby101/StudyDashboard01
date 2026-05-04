@@ -13,6 +13,24 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                const originalWarn = console.warn;
+                const originalError = console.error;
+                console.warn = (...args) => {
+                  if (args[0] && typeof args[0] === 'string' && (args[0].includes('preload') || args[0].includes('prefetch'))) return;
+                  originalWarn.apply(console, args);
+                };
+                console.error = (...args) => {
+                  if (args[0] && typeof args[0] === 'string' && (args[0].includes('401') || args[0].includes('Unauthorized'))) return;
+                  originalError.apply(console, args);
+                };
+              })();
+            `,
+          }}
+        />
       </head>
       <body suppressHydrationWarning>
         <AppProvider>
