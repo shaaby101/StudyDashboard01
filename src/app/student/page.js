@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import styles from './student.module.css';
 
 export default function StudentDashboard() {
-  const { user, attendance, courses, schedule } = useApp();
+  const { user, attendance, courses, schedule, studentStats, badges, academicRisk } = useApp();
   const router = useRouter();
 
   if (!user) return null;
@@ -34,9 +34,18 @@ export default function StudentDashboard() {
         <div className={styles.header}>
           <div>
             <h1>Welcome back, {user.name?.split(' ')[0]} 👋</h1>
-            <p>Here&apos;s your academic overview for today</p>
+            <p>Level {studentStats.level} • {studentStats.rank} • {studentStats.streak} day streak 🔥</p>
           </div>
           <div className={styles.headerActions}>
+            <div className={styles.xpBarWrapper}>
+               <div className={styles.xpInfo}>
+                 <span>XP: {studentStats.xp} / {studentStats.nextLevelXp}</span>
+                 <span>Level {studentStats.level}</span>
+               </div>
+               <div className={styles.xpBar}>
+                 <div className={styles.xpFill} style={{ width: `${(studentStats.xp / studentStats.nextLevelXp) * 100}%` }} />
+               </div>
+            </div>
             <button className="btn btn-primary" onClick={() => router.push('/student/ai')}>
               <IconBrain size={18} />
               AI Companion
@@ -153,6 +162,50 @@ export default function StudentDashboard() {
           </div>
         </div>
 
+        <div className={styles.mainGrid}>
+          {/* Academic Risk Predictor */}
+          <div className={`glass-card-static ${styles.riskCard}`}>
+             <div className={styles.cardHeader}>
+               <h3>AI Academic Predictor</h3>
+               <span className={`badge ${academicRisk.overall === 'Low' ? 'badge-success' : 'badge-danger'}`}>
+                 {academicRisk.overall} Risk
+               </span>
+             </div>
+             <div className={styles.riskContent}>
+                <div className={styles.gaugeWrapper}>
+                  <GaugeChart value={academicRisk.score} color={academicRisk.score < 30 ? '#00B894' : academicRisk.score < 60 ? '#FDCB6E' : '#E17055'} />
+                  <div className={styles.riskLabel}>Risk Score: {academicRisk.score}</div>
+                </div>
+                <div className={styles.riskFactors}>
+                   <h4>Contributing Factors:</h4>
+                   {academicRisk.factors.map(f => (
+                     <div key={f.id} className={`${styles.factorItem} ${styles[f.type]}`}>
+                        {f.type === 'positive' ? '✅' : '⚠️'} {f.text}
+                     </div>
+                   ))}
+                </div>
+             </div>
+          </div>
+
+          {/* Achievements / Badges */}
+          <div className={`glass-card-static ${styles.badgesCard}`}>
+            <div className={styles.cardHeader}>
+               <h3>Achievements</h3>
+               <button className="btn btn-ghost btn-sm">View Passport</button>
+            </div>
+            <div className={styles.badgeGrid}>
+               {badges.map(b => (
+                 <div key={b.id} className={styles.badgeItem} title={b.description}>
+                   <div className={`${styles.badgeIcon} ${styles[b.rarity]}`}>
+                     {b.icon}
+                   </div>
+                   <span>{b.name}</span>
+                 </div>
+               ))}
+            </div>
+          </div>
+        </div>
+
         {/* Shortage Alerts */}
         {lowAttendance.length > 0 && (
           <div className={`glass-card-static ${styles.alertCard}`}>
@@ -205,6 +258,10 @@ export default function StudentDashboard() {
             <button className={`glass-card ${styles.actionCard}`} onClick={() => router.push('/student/courses')}>
               <IconBook size={24} />
               <span>Course Materials</span>
+            </button>
+            <button className={`glass-card ${styles.actionCard}`} onClick={() => router.push('/student/roadmap')}>
+              <IconTrendingUp size={24} />
+              <span>Career Roadmap</span>
             </button>
             <button className={`glass-card ${styles.actionCard}`} onClick={() => router.push('/student/schedule')}>
               <IconCalendar size={24} />

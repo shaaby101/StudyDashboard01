@@ -241,10 +241,67 @@ export function AppProvider({ children }) {
     { id: 3, type: 'success', message: 'Leave request approved', time: '1 day ago', read: true },
   ]);
 
+  // --- NEW WINNING FEATURES STATE ---
+  const [studentStats, setStudentStats] = useState({
+    xp: 2450,
+    level: 12,
+    nextLevelXp: 3000,
+    streak: 5,
+    rank: 'Gold II'
+  });
+
+  const [badges, setBadges] = useState([
+    { id: 1, name: 'Night Owl', icon: '🌙', description: 'Used Study Corner after 10 PM', rarity: 'rare' },
+    { id: 2, name: 'Consistency King', icon: '🔥', description: '5 day study streak', rarity: 'legendary' },
+    { id: 3, name: 'Top Helper', icon: '🤝', description: 'Answered 5 forum questions', rarity: 'common' }
+  ]);
+
+  const [academicRisk, setAcademicRisk] = useState({
+    overall: 'Low',
+    score: 15, // 0-100, lower is better
+    factors: [
+      { id: 1, text: 'Strong performance in Lab sessions', type: 'positive' },
+      { id: 2, text: 'Low engagement in OS Lectures (65%)', type: 'warning' }
+    ]
+  });
+
+  const addXp = useCallback((amount) => {
+    setStudentStats(prev => {
+      const newXp = prev.xp + amount;
+      if (newXp >= prev.nextLevelXp) {
+        setNotifications(n => [{
+          id: Date.now(),
+          type: 'success',
+          message: `Level Up! You reached Level ${prev.level + 1}`,
+          time: 'Just now',
+          read: false
+        }, ...n]);
+        return {
+          ...prev,
+          xp: newXp,
+          level: prev.level + 1,
+          nextLevelXp: Math.round(prev.nextLevelXp * 1.5)
+        };
+      }
+      return { ...prev, xp: newXp };
+    });
+  }, []);
+
+
   useEffect(() => {
     const savedTheme = localStorage.getItem('studesh-theme') || 'light';
     setTheme(savedTheme);
     document.documentElement.setAttribute('data-theme', savedTheme);
+
+    // Hydrate user from localStorage for immediate UI responsiveness
+    const savedUser = localStorage.getItem('studesh-user');
+    if (savedUser) {
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (e) {
+        console.error('Failed to parse saved user', e);
+      }
+    }
   }, []);
 
   const applyUserProfile = useCallback((serverUser) => {
@@ -271,13 +328,20 @@ export function AppProvider({ children }) {
       const res = await fetch('/api/auth/me');
       if (res.ok) {
         const data = await res.json();
-        setUser(applyUserProfile(data.user));
+        const fullUser = applyUserProfile(data.user);
+        setUser(fullUser);
+        localStorage.setItem('studesh-user', JSON.stringify(fullUser));
         return;
       }
     } catch (error) {
       // Ignore fetch failures and treat as logged out.
     }
-    setUser(null);
+    // Only clear if we don't have a demo user (demo users have 'DEMO' in their ID)
+    setUser(prev => {
+      if (prev?.id?.includes('DEMO')) return prev;
+      localStorage.removeItem('studesh-user');
+      return null;
+    });
   }, [applyUserProfile]);
 
   useEffect(() => {
@@ -317,6 +381,7 @@ export function AppProvider({ children }) {
         role: demoUser.role,
       });
       setUser(demoProfile);
+      localStorage.setItem('studesh-user', JSON.stringify(demoProfile));
       return { ok: true, user: demoProfile, demo: true };
     }
 
@@ -332,6 +397,7 @@ export function AppProvider({ children }) {
       }
       const nextUser = applyUserProfile(data.user);
       setUser(nextUser);
+      localStorage.setItem('studesh-user', JSON.stringify(nextUser));
       return { ok: true, user: nextUser };
     } catch (error) {
       return { ok: false, error: 'Login failed.' };
@@ -364,6 +430,7 @@ export function AppProvider({ children }) {
       // Ignore logout failures.
     }
     setUser(null);
+    localStorage.removeItem('studesh-user');
   }, []);
 
   const addAppointment = useCallback((apt) => {
@@ -509,6 +576,10 @@ export function AppProvider({ children }) {
     results,
     studyHours,
     logStudyTime,
+    studentStats,
+    addXp,
+    badges,
+    academicRisk
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

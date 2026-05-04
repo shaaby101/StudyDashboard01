@@ -4,15 +4,40 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { useApp } from '@/context/AppContext';
 import AnimatedCounter from '@/components/AnimatedCounter';
 import { BarChart } from '@/components/Charts';
-import { IconUsers, IconCalendar, IconUpload, IconMail, IconArrowRight, IconCheck, IconClock } from '@/components/Icons';
+import { IconUsers, IconCalendar, IconUpload, IconMail, IconArrowRight, IconCheck, IconClock, IconTrendingUp, IconX, IconWand } from '@/components/Icons';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import styles from './faculty.module.css';
+import ReactMarkdown from 'react-markdown';
 
 export default function FacultyDashboard() {
   const { user, courses, schedule, leaveRequests } = useApp();
   const router = useRouter();
+  const [generatingReport, setGeneratingReport] = useState(false);
+  const [report, setReport] = useState(null);
 
   if (!user) return null;
+
+  const generateReport = async () => {
+    setGeneratingReport(true);
+    try {
+      const res = await fetch('/api/faculty/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          facultyName: user.name,
+          department: user.department,
+          subjects: user.subjects || []
+        }),
+      });
+      const data = await res.json();
+      if (data.report) setReport(data.report);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setGeneratingReport(false);
+    }
+  };
 
   const mySubjects = courses.filter(c => user.subjects?.includes(c.id));
   const today = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][new Date().getDay()];
@@ -64,6 +89,66 @@ export default function FacultyDashboard() {
             <div className="stat-label">Leave Requests</div>
           </div>
         </div>
+
+        {/* --- SUCCESS PULSE INSIGHTS --- */}
+        <div className={`glass-card-static ${styles.pulseCard}`} style={{ marginTop: '24px', padding: '24px', background: 'linear-gradient(135deg, rgba(var(--accent-rgb), 0.05), rgba(0, 184, 148, 0.05))' }}>
+           <div className={styles.cardHeader}>
+              <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <IconTrendingUp size={20} color="var(--accent)" />
+                Success Pulse — AI Engagement Insights
+              </h3>
+              <span className="badge badge-success">Live Analysis</span>
+           </div>
+           <div className={styles.pulseGrid} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px', marginTop: '20px' }}>
+              <div className={styles.pulseItem}>
+                 <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>Avg. Class Engagement</span>
+                 <div style={{ fontSize: '1.5rem', fontWeight: 700, margin: '4px 0' }}>84.2%</div>
+                 <div style={{ fontSize: '0.75rem', color: 'var(--success)', fontWeight: 600 }}>↑ 2.4% from last week</div>
+              </div>
+              <div className={styles.pulseItem}>
+                 <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>Students at Risk</span>
+                 <div style={{ fontSize: '1.5rem', fontWeight: 700, margin: '4px 0', color: 'var(--danger)' }}>3</div>
+                 <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>Attendance below 75%</div>
+              </div>
+              <div className={styles.pulseItem}>
+                 <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>Content Clarity Score</span>
+                 <div style={{ fontSize: '1.5rem', fontWeight: 700, margin: '4px 0', color: 'var(--accent)' }}>A-</div>
+                 <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>Based on forum questions</div>
+              </div>
+              <div className={styles.pulseItem}>
+                 <button 
+                  className="btn btn-primary" 
+                  style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                  onClick={generateReport}
+                  disabled={generatingReport}
+                 >
+                    {generatingReport ? <div className="spinner-sm" /> : <IconWand size={18} />}
+                    {generatingReport ? 'Analyzing...' : 'Generate Report'}
+                 </button>
+              </div>
+           </div>
+        </div>
+
+        {/* AI Report Modal */}
+        {report && (
+          <div className={styles.modalOverlay}>
+            <div className={`glass-card-static ${styles.reportModal}`}>
+              <div className={styles.modalHeader}>
+                <h3>AI Success Pulse Report</h3>
+                <button className={styles.closeBtn} onClick={() => setReport(null)}>
+                  <IconX size={20} />
+                </button>
+              </div>
+              <div className={styles.reportContent}>
+                <ReactMarkdown>{report}</ReactMarkdown>
+              </div>
+              <div className={styles.modalFooter}>
+                <button className="btn btn-primary" onClick={() => window.print()}>Download PDF</button>
+                <button className="btn btn-ghost" onClick={() => setReport(null)}>Dismiss</button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className={styles.mainGrid}>
           {/* Today's Classes */}

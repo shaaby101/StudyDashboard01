@@ -40,3 +40,118 @@
   .mainGrid { grid-template-columns: 1fr; }
   .actionGrid { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* Modal Styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.reportModal {
+  background: var(--surface);
+  width: 100%;
+  max-width: 800px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-2xl);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+}
+
+.modalHeader {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--surface-elevated);
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  color: var(--accent);
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.closeBtn:hover {
+  background: var(--danger-light);
+  color: var(--danger);
+}
+
+.reportContent {
+  padding: 32px;
+  overflow-y: auto;
+  flex: 1;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.reportContent h1, .reportContent h2, .reportContent h3 {
+  margin-top: 24px;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+}
+
+.reportContent p {
+  margin-bottom: 16px;
+}
+
+.reportContent ul {
+  margin-bottom: 16px;
+  padding-left: 20px;
+}
+
+.reportContent li {
+  margin-bottom: 8px;
+}
+
+.modalFooter {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background: var(--surface-elevated);
+}
+
+@media (max-width: 768px) {
+  .reportModal {
+    max-height: 95vh;
+  }
+  .reportContent {
+    padding: 20px;
+  }
+}
+
