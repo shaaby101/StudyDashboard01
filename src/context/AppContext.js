@@ -324,24 +324,40 @@ export function AppProvider({ children }) {
   }, []);
 
   const refreshUser = useCallback(async () => {
+    // 1. Check localStorage first for a saved session (demo or real)
+    try {
+      const stored = localStorage.getItem('studesh-user');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        // If this is a demo user, restore immediately — no API needed
+        if (parsed?.id?.includes('DEMO')) {
+          setUser(applyUserProfile(parsed));
+          return;
+        }
+      }
+    } catch (_) {
+      // Ignore parse errors
+    }
+
+    // 2. For real users, validate session via API
     try {
       const res = await fetch('/api/auth/me');
       if (res.ok) {
         const data = await res.json();
-        const fullUser = applyUserProfile(data.user);
-        setUser(fullUser);
-        localStorage.setItem('studesh-user', JSON.stringify(fullUser));
-        return;
+        if (data.user) {
+          const fullUser = applyUserProfile(data.user);
+          setUser(fullUser);
+          localStorage.setItem('studesh-user', JSON.stringify(fullUser));
+          return;
+        }
       }
-    } catch (error) {
-      // Ignore fetch failures and treat as logged out.
+    } catch (_) {
+      // Ignore fetch failures
     }
-    // Only clear if we don't have a demo user (demo users have 'DEMO' in their ID)
-    setUser(prev => {
-      if (prev?.id?.includes('DEMO')) return prev;
-      localStorage.removeItem('studesh-user');
-      return null;
-    });
+
+    // 3. No valid session found — clear everything
+    localStorage.removeItem('studesh-user');
+    setUser(null);
   }, [applyUserProfile]);
 
   useEffect(() => {

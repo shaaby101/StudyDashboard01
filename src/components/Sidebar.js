@@ -117,7 +117,7 @@ export default function Sidebar() {
           </div>
 
           {/* Logout */}
-          <button className={styles.navItem} onClick={() => { logout(); router.push('/'); }}>
+          <button className={styles.navItem} onClick={async () => { await logout(); router.push('/'); }}>
             <IconLogout size={20} />
             {!sidebarCollapsed && <span>Logout</span>}
           </button>

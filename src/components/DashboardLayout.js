@@ -51,12 +51,16 @@ export default function DashboardLayout({ children, requiredRole }) {
     }
   }, [user, requiredRole, router, loadingUser]);
 
-  if (loadingUser || !user || (requiredRole && user.role !== requiredRole)) {
+  if (loadingUser) {
     return (
       <div className={styles.loading}>
         <div className={styles.loadingSpinner} />
       </div>
     );
+  }
+
+  if (!user || (requiredRole && user.role !== requiredRole)) {
+    return null;
   }
 
   return (
