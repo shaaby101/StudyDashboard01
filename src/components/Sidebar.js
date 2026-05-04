@@ -16,12 +16,14 @@ const NAV_ITEMS = {
     { label: 'AI Companion', icon: IconBrain, path: '/student/ai' },
     { label: 'Courses', icon: IconBook, path: '/student/courses' },
     { label: 'Schedule', icon: IconCalendar, path: '/student/schedule' },
+    { label: 'Forum', icon: IconGrid, path: '/student/forum' },
   ],
   faculty: [
     { label: 'Dashboard', icon: IconDashboard, path: '/faculty' },
     { label: 'Mark Attendance', icon: IconUsers, path: '/faculty/attendance' },
     { label: 'My Schedule', icon: IconCalendar, path: '/faculty/schedule' },
     { label: 'Materials', icon: IconUpload, path: '/faculty/materials' },
+    { label: 'Forum', icon: IconGrid, path: '/faculty/forum' },
     { label: 'Leave', icon: IconMail, path: '/faculty/leave' },
   ],
   admin: [

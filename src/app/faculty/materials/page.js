@@ -2,35 +2,70 @@
 
 import DashboardLayout from '@/components/DashboardLayout';
 import { useApp } from '@/context/AppContext';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { IconUpload, IconFileText, IconCheck, IconX } from '@/components/Icons';
 import styles from './materials.module.css';
 
 export default function FacultyMaterials() {
-  const { user, courses, syllabus } = useApp();
+  const { user, courses, syllabus, addCourse, materials, addMaterial, removeMaterial } = useApp();
   const [selectedSubject, setSelectedSubject] = useState(user?.subjects?.[0] || '');
-  const [uploadedFiles, setUploadedFiles] = useState([
-    { id: 1, name: 'DSA_Unit1_Notes.pdf', size: '2.4 MB', date: '2026-04-28', subject: 'CS301' },
-    { id: 2, name: 'DBMS_ER_Diagram_Examples.pdf', size: '1.8 MB', date: '2026-04-25', subject: 'CS303' },
-    { id: 3, name: 'Graph_Algorithms_Slides.pptx', size: '5.1 MB', date: '2026-04-20', subject: 'CS301' },
-  ]);
+  const [showCourseForm, setShowCourseForm] = useState(false);
+  const [newCourse, setNewCourse] = useState({ code: '', name: '', topics: '' });
+  const fileInputRef = useRef(null);
   const [dragOver, setDragOver] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
   const mySubjects = courses.filter(c => user?.subjects?.includes(c.id));
-  const filteredFiles = uploadedFiles.filter(f => f.subject === selectedSubject);
+  const filteredFiles = materials.filter(f => f.subject === selectedSubject);
 
-  const handleUpload = () => {
-    const newFile = {
-      id: Date.now(),
-      name: `Course_Material_${Date.now()}.pdf`,
-      size: '1.2 MB',
-      date: new Date().toISOString().split('T')[0],
-      subject: selectedSubject,
-    };
-    setUploadedFiles(prev => [newFile, ...prev]);
+  const handleFileUpload = (e) => {
+    const files = e.target.files || e.dataTransfer.files;
+    if (!files || files.length === 0) return;
+    
+    Array.from(files).forEach(file => {
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+      const newFile = {
+        id: Date.now() + Math.random(),
+        name: file.name,
+        size: file.size < 1024 * 1024 ? `${Math.round(file.size / 1024)} KB` : `${sizeMB} MB`,
+        date: new Date().toISOString().split('T')[0],
+        subject: selectedSubject,
+        fileObj: file,
+      };
+      addMaterial(newFile);
+    });
+    
     setUploadSuccess(true);
     setTimeout(() => setUploadSuccess(false), 3000);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleCreateCourse = (e) => {
+    e.preventDefault();
+    if (!newCourse.code || !newCourse.name) return;
+    
+    const courseObj = {
+      id: newCourse.code.toUpperCase(),
+      name: newCourse.name,
+      code: newCourse.code.toUpperCase(),
+      faculty: user?.name || 'Faculty',
+      credits: 3
+    };
+    
+    const syllabusObj = {
+      title: newCourse.name,
+      units: [
+        {
+          name: 'Unit 1: Introduction',
+          topics: newCourse.topics.split(',').map(t => t.trim()).filter(Boolean)
+        }
+      ]
+    };
+    
+    addCourse(courseObj, syllabusObj);
+    setNewCourse({ code: '', name: '', topics: '' });
+    setShowCourseForm(false);
+    setSelectedSubject(courseObj.id);
   };
 
   return (
@@ -51,16 +86,66 @@ export default function FacultyMaterials() {
               {sub.code} — {sub.name}
             </button>
           ))}
+          <button 
+            className={`${styles.tab} ${showCourseForm ? styles.active : ''}`}
+            onClick={() => setShowCourseForm(!showCourseForm)}
+            style={{ borderStyle: 'dashed' }}
+          >
+            + New Course
+          </button>
         </div>
+
+        {showCourseForm && (
+          <form className={`glass-card-static ${styles.formCard}`} onSubmit={handleCreateCourse}>
+            <h3>Create New Course & Syllabus</h3>
+            <div className={styles.formRow}>
+              <div className={styles.inputGroup}>
+                <label>Course Code</label>
+                <input 
+                  placeholder="e.g. AI401" 
+                  value={newCourse.code} 
+                  onChange={e => setNewCourse({...newCourse, code: e.target.value})}
+                  required 
+                />
+              </div>
+              <div className={styles.inputGroup}>
+                <label>Course Name</label>
+                <input 
+                  placeholder="e.g. Artificial Intelligence" 
+                  value={newCourse.name} 
+                  onChange={e => setNewCourse({...newCourse, name: e.target.value})}
+                  required 
+                />
+              </div>
+            </div>
+            <div className={styles.inputGroup}>
+              <label>Initial Topics (Comma separated)</label>
+              <input 
+                placeholder="e.g. Neural Networks, Machine Learning, Deep Learning" 
+                value={newCourse.topics} 
+                onChange={e => setNewCourse({...newCourse, topics: e.target.value})}
+                required 
+              />
+            </div>
+            <button type="submit" className={styles.submitBtn}>Add Course & Coursework</button>
+          </form>
+        )}
 
         {/* Upload Zone */}
         <div
           className={`glass-card-static ${styles.uploadZone} ${dragOver ? styles.dragOver : ''}`}
           onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-          onDragLeave={() => setDragOver(false)}
-          onDrop={(e) => { e.preventDefault(); setDragOver(false); handleUpload(); }}
-          onClick={handleUpload}
+          onDragLeave={(e) => { e.preventDefault(); setDragOver(false); }}
+          onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFileUpload(e); }}
+          onClick={() => fileInputRef.current?.click()}
         >
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleFileUpload} 
+            style={{ display: 'none' }} 
+            multiple 
+          />
           <IconUpload size={40} />
           <h3>Drop files here or click to upload</h3>
           <p>Supports PDF, PPTX, DOCX, TXT — Max 25MB</p>
@@ -92,7 +177,7 @@ export default function FacultyMaterials() {
                     <h4>{file.name}</h4>
                     <span>{file.size} • Uploaded {file.date}</span>
                   </div>
-                  <button className={styles.removeBtn}>
+                  <button className={styles.removeBtn} onClick={() => removeMaterial(file.id)}>
                     <IconX size={16} />
                   </button>
                 </div>

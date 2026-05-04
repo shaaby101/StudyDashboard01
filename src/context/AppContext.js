@@ -149,6 +149,26 @@ export function AppProvider({ children }) {
   const [user, setUser] = useState(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [attendance, setAttendance] = useState(MOCK_ATTENDANCE);
+  const [courses, setCourses] = useState(MOCK_COURSES);
+  const [syllabus, setSyllabus] = useState(MOCK_SYLLABUS);
+  const [materials, setMaterials] = useState([
+    { id: 1, name: 'DSA_Unit1_Notes.pdf', size: '2.4 MB', date: '2026-04-28', subject: 'CS301' },
+    { id: 2, name: 'DBMS_ER_Diagram_Examples.pdf', size: '1.8 MB', date: '2026-04-25', subject: 'CS303' },
+    { id: 3, name: 'Graph_Algorithms_Slides.pptx', size: '5.1 MB', date: '2026-04-20', subject: 'CS301' },
+  ]);
+  const [forums, setForums] = useState({
+    'CS301': [
+      {
+        id: 1,
+        author: 'Arjun Mehta',
+        role: 'student',
+        question: 'Can someone explain AVL tree rotations?',
+        timestamp: '2 hours ago',
+        answers: [],
+        aiPrompted: false,
+      }
+    ]
+  });
   const [notifications, setNotifications] = useState([
     { id: 1, type: 'warning', message: 'Low attendance in CS304 — 68%', time: '2 hours ago', read: false },
     { id: 2, type: 'info', message: 'New syllabus uploaded for CS301', time: '5 hours ago', read: false },
@@ -190,6 +210,92 @@ export function AppProvider({ children }) {
     localStorage.removeItem('studesh-user');
   }, []);
 
+  const enrollCourse = useCallback((courseId) => {
+    setUser(prev => {
+      if (prev?.role !== 'student' || prev.enrolledCourses?.includes(courseId)) return prev;
+      const updated = { ...prev, enrolledCourses: [...(prev.enrolledCourses || []), courseId] };
+      localStorage.setItem('studesh-user', JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
+  const addCourse = useCallback((course, courseSyllabus) => {
+    setCourses(prev => [...prev, course]);
+    setSyllabus(prev => ({ ...prev, [course.id]: courseSyllabus }));
+    setUser(prev => {
+      if (prev?.role === 'faculty') {
+        const updated = { ...prev, subjects: [...(prev.subjects || []), course.id] };
+        localStorage.setItem('studesh-user', JSON.stringify(updated));
+        return updated;
+      }
+      return prev;
+    });
+  }, []);
+
+  const addMaterial = useCallback((material) => {
+    setMaterials(prev => [material, ...prev]);
+  }, []);
+
+  const removeMaterial = useCallback((id) => {
+    setMaterials(prev => prev.filter(m => m.id !== id));
+  }, []);
+
+  const addForumQuestion = useCallback((courseId, question) => {
+    setForums(prev => {
+      const courseForums = prev[courseId] || [];
+      return {
+        ...prev,
+        [courseId]: [
+          {
+            id: Date.now(),
+            author: user?.name,
+            role: user?.role,
+            question,
+            timestamp: 'Just now',
+            answers: [],
+            aiPrompted: false,
+          },
+          ...courseForums
+        ]
+      };
+    });
+  }, [user]);
+
+  const addForumAnswer = useCallback((courseId, questionId, content, isAi = false) => {
+    setForums(prev => {
+      const courseForums = prev[courseId] || [];
+      return {
+        ...prev,
+        [courseId]: courseForums.map(q => 
+          q.id === questionId 
+            ? { 
+                ...q, 
+                answers: [...q.answers, {
+                  id: Date.now(),
+                  author: isAi ? 'AI Companion' : user?.name,
+                  role: isAi ? 'ai' : user?.role,
+                  content,
+                  timestamp: 'Just now'
+                }] 
+              }
+            : q
+        )
+      };
+    });
+  }, [user]);
+
+  const promptAiAnswer = useCallback((courseId, questionId) => {
+    setForums(prev => {
+      const courseForums = prev[courseId] || [];
+      return {
+        ...prev,
+        [courseId]: courseForums.map(q => 
+          q.id === questionId ? { ...q, aiPrompted: true } : q
+        )
+      };
+    });
+  }, []);
+
   const markAttendance = useCallback((courseId, studentId, present) => {
     setAttendance(prev => {
       const updated = { ...prev };
@@ -213,15 +319,24 @@ export function AppProvider({ children }) {
     logout,
     sidebarCollapsed,
     setSidebarCollapsed,
-    courses: MOCK_COURSES,
+    courses,
     attendance,
     markAttendance,
     schedule: MOCK_SCHEDULE,
     facultyList: MOCK_FACULTY_LIST,
     leaveRequests: MOCK_LEAVE_REQUESTS,
-    syllabus: MOCK_SYLLABUS,
+    syllabus,
     notifications,
     setNotifications,
+    enrollCourse,
+    addCourse,
+    materials,
+    addMaterial,
+    removeMaterial,
+    forums,
+    addForumQuestion,
+    addForumAnswer,
+    promptAiAnswer,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

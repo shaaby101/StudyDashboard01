@@ -73,3 +73,20 @@
   padding: 4px 12px; background: var(--accent-light); color: var(--accent);
   border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 500;
 }
+
+.formCard { padding: 24px; display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+.formCard h3 { font-size: 1.125rem; font-weight: 600; margin-bottom: 8px; }
+.formRow { display: flex; gap: 16px; flex-wrap: wrap; }
+.inputGroup { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 200px; }
+.inputGroup label { font-size: 0.8125rem; font-weight: 600; color: var(--text-secondary); }
+.inputGroup input {
+  padding: 10px 12px; border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle); background: var(--bg-primary);
+  color: var(--text-primary); font-family: inherit;
+}
+.submitBtn {
+  padding: 10px 20px; background: var(--accent); color: white;
+  border: none; border-radius: var(--radius-md); font-weight: 600;
+  cursor: pointer; align-self: flex-start; margin-top: 8px;
+}
+.submitBtn:hover { background: var(--accent-dark); }
