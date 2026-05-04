@@ -101,11 +101,44 @@ export default function TimetableGenerator() {
 
   const handleGenerate = async () => {
     setIsGenerating(true);
-    // Simulate AI processing
     await new Promise(r => setTimeout(r, 2000));
     const result = generateTimetable(facultyList, config);
     setGenerated(result);
     setIsGenerating(false);
+  };
+
+  const exportCSV = () => {
+    if (!generated) return;
+    const days = config.workingDays;
+    const headers = ['Time', ...days];
+    const rows = [headers];
+
+    generated.slots.forEach((slot, si) => {
+      const row = [`${slot.start} - ${slot.end}`];
+      days.forEach(day => {
+        const cell = generated.timetable[day]?.[si];
+        if (cell && !cell.empty) {
+          row.push(`${cell.subject} | ${cell.faculty} | ${cell.room}`);
+        } else {
+          row.push('-');
+        }
+      });
+      rows.push(row);
+    });
+
+    const csvContent = rows
+      .map(row => row.map(val => `"${String(val).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `timetable_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const addFaculty = () => {
@@ -263,7 +296,7 @@ export default function TimetableGenerator() {
                 <button className="btn btn-secondary btn-sm" onClick={handleGenerate}>
                   <IconRefresh size={14} /> Regenerate
                 </button>
-                <button className="btn btn-primary btn-sm">
+                <button className="btn btn-primary btn-sm" onClick={exportCSV}>
                   <IconDownload size={14} /> Export CSV
                 </button>
               </div>
