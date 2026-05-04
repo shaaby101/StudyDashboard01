@@ -45,7 +45,7 @@ export default function DashboardLayout({ children, requiredRole }) {
   useEffect(() => {
     if (loadingUser) return;
     if (!user) {
-      router.replace('/login');
+      router.replace('/');
     } else if (requiredRole && user.role !== requiredRole) {
       router.replace(`/${user.role}`);
     }
